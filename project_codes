@@ -1,0 +1,269 @@
+##TRENDS ON TWITTER
+
+blm <- rtweet::search_tweets(q = "#BLM", n = 5000, lang = "en")
+
+dfblm <- data.frame(tweets = c("#ProLife people are hilarious when it comes to #KyleRittenhouse murdering 2 people! Why aren’t they also protesting when cops murder people? You can’t be pro life  and worship murderers. #BreonnaTaylor #BLM #SayHerName", 
+                               "BLM-antifa repeatedly hurl degrading insults at a woman holding a pro-@OmahaPolice sign outside the police headquarters tonight. #BLM https://t.co/t8q1n1AIBz",
+                               "@AP We live in a world where people raise $2Mil to free a killer from jail but 18yr old #SincerePierce, who was killed by the police last week, family is selling dinners today just to raise money to bury him. #BLM #justforsincerepierce #justiceforAJCrooms https://t.co/ypiwIVXvNo",
+                               "It’s a great day to remember silence is violence. #blm",
+                               "BLM-antifa repeatedly hurl degrading insults at a woman holding a pro-@OmahaPolice sign outside the police headquarters tonight. #BLM https://t.co/t8q1n1AIBz",
+                               "Today I learned: In #america you can #murder #people and become a #celebrity. #KyleRittenhouse #WhiteSupremacy #BLM #thanks @realDonaldTrump for Making America Great Again! #MAGA",
+                               "That one day we will truly be unified. #BLM https://t.co/0A7nI2ceWj",
+                               "This is @cornell. After a summer of saying “#BLM” this is how Black students who speak up are treated. https://t.co/uyTdEEO7tr",
+                               "Complicit Police do nothing. If these activists were having an armed #BLM protest, Police wouldn't be in attack mode. https://t.co/jdfNL72vI3"))
+
+print(df)
+
+install.packages("writexl")
+library("writexl")
+write_xlsx(dfblm,"/Users/selamtesfamariam/Desktop/EPPS 6356/data.xlsx")
+
+vote <- rtweet::search_tweets(q = "#vote", n = 100, lang = "en")
+
+dfvote <- data.frame(tweets = c("Georgia voters check your registration!! Don’t allow them to purge &amp; cheat.  This senate race is too important !  #vote #VoteGeorgiaSenateBlue @ossoff @ReverendWarnock https://t.co/jmhxWmdZdn",
+                                "@realDonaldTrump Thank the Lord that Biden was elected and Trump will have NOTHING to do with deployment of the #COVID19 vaccine #BidenHarris #CovidVaccine Now, #GEORGIA it’s time!! #WarnockOssoffForSenate #WarnockForSenate #CovidRelief #CovidReliefNOW #RunOffElection #OssoffForSenate #Vote 🇺🇸 https://t.co/TCdudSlV7D",
+                                "Making calls to #Georgia voters. The runoff election for  U.S. will decide the direction of Georgia and our country. #vote @MomsDemand #MomsAreEverywhere https://t.co/HwnVs4rku4",
+                                "Georgia, “lets get this done again“ ~staceyabrams  ▶️Register ▶️Request your ballot ▶️make a plan and #Vote ▶️@ReverendWarnock and @ossoff #gapol https://t.co/CQN850P8TP",
+                                "Reading that people who JUST voted in #Georgia are being purged from the voter registration rolls  If you live in Georgia check your #VoterRegistration before Dec 7th so you can #Vote on Jan 5 for the #GeorgiaRunoffs #VoteOssoffWarnock4Senate  #FlipTheSenateBlue #FreshTweets https://t.co/crbSzdBakM",
+                                "Georgia residents! There’s still time to request your mail-in ballot for the essential 1/5 Senate runoffs! Please do it today. If those two seats don’t go Democratic, Mitch will block every attempt Biden makes to help this country, including covid relief funds. #Vote🙏😷❤️ https://t.co/rGQiVxdgxX",
+                                "“In U.S.A. , this cannot justify the disenfranchisement of a single voter, let alone all the voters of its sixth most populated state,” the scathing opinion said. “Our people, laws, and institutions demand more.” Judge Matthew Brann #Michigan, do not let them steal your #Vote https://t.co/UcEva7ljrc",
+                                "Come on, #Georgia! Don’t sit this one out. Your #vote matters. https://t.co/JSMMWh7aAH"))
+
+write_xlsx(dfvote,"/Users/selamtesfamariam/Desktop/EPPS 6356/data2.xlsx")
+
+
+##USING GGPLOT TO GRAPH
+
+#TWITTER USER LOCATION
+
+users <- search_users("#rstats",
+                      n = 1000)
+# how many locations are represented
+length(unique(users$location))
+## [1] 554
+
+users %>%
+  count(location, sort = TRUE) %>%
+  mutate(location = reorder(location,n)) %>%
+  na.omit() %>%
+  top_n(20) %>%
+  ggplot(aes(x = location,y = n)) +
+  geom_col(fill = "darkblue") +
+  coord_flip() +
+  labs(x = "Location",
+       y = "Count",
+       title = "Locations of Twitter Users") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                 panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
+
+#PLOT1
+
+#plotting the number of retweets over time
+
+rdtg<- get_timelines(c("Geico"), n = 100)
+
+rdtg <- ggplot(rdt, aes(x = created_at, y = retweet_count)) +
+  geom_point(colour = "lightgreen", alpha = 0.5, size = 2) +
+  geom_smooth(se = FALSE, colour = "blue", alpha = 0.5) +
+  theme_minimal()  +
+  labs(x = "Date", y = "# retweets", 
+       title = "Number of retweets of tweets from '@GEICO' over time") 
+  
+rdtg
+
+#to zoom in or out
+rdtg + coord_cartesian(ylim = c(0, 10))
+
+
+###PLOT2 
+#BLK TWEETING TREND
+
+library("lubridate")
+library("ggplot2")
+blm_tweets <- get_timeline("Blklivesmatter", n = 1000)
+
+ggplot(data = blm_tweets,
+       aes(month(created_at, label=TRUE, abbr=TRUE),
+           group=factor(year(created_at)), color=factor(year(created_at))))+
+  geom_line(stat="count") +
+  geom_point(stat="count") +
+  labs(x="Month", colour="Year") +
+  ggtitle("BLM Tweets from 2018-2020") +
+  xlab("Month") + ylab("Number of tweets") +
+  theme_minimal()
+legend(1, 95, legend=c("Line 1", "Line 2", "Line 3"),
+       col=c("red", "green", "blue"), lty=1:2, cex=0.8)
+
+
+
+ggplot(data = blm_tweets, aes(x = year(created_at))) +
+  geom_bar(aes(fill = ..count..)) +
+  xlab("Year") + ylab("Number of tweets") +
+  ggtitle("BLM frequency of tweets per year") +
+  scale_x_continuous (breaks = c(2010:2018)) +
+  theme_minimal() +
+  scale_fill_gradient(low = "cadetblue3", high = "chartreuse4")
+
+
+ggplot(data = blm_tweets, aes(x = month(created_at, label = TRUE))) +
+  geom_bar(aes(fill = ..count..)) +
+  xlab("Month") + ylab("Number of tweets") + 
+  ggtitle("BLM Number of Tweets a Month") +
+  theme_minimal() +
+  scale_fill_gradient(low = "cadetblue3", high = "chartreuse4")
+
+
+ggplot(data = blm_tweets, aes(x = wday(created_at, label = TRUE))) +
+  geom_bar(aes(fill = ..count..)) +
+  xlab("Day of the week") + ylab("Number of tweets") +
+  ggtitle("BLM Tweets per Week")
+  theme_minimal() +
+  scale_fill_gradient(low = "turquoise3", high = "darkgreen")
+
+
+
+###PLOT3
+#TEXT MINING-SENTIMENTAL GRAPH
+install.packages(c("tm", "wordcloud"))
+library("tm")
+library("wordcloud")
+tweet_text <- blm_tweets$text
+       
+tweet_text <- iconv(tweet_text, from="UTF-8", to="ASCII", sub="")
+tweet_text<-gsub("(RT|via)((?:\\b\\w*@\\w+)+)","",tweet_text)
+
+tweet_text<-gsub("@\\w+","",tweet_text)
+blm_sentiment<-get_nrc_sentiment((tweet_text))
+sentimentscores<-data.frame(colSums(blm_sentiment[,]))
+names(sentimentscores) <- "Score"
+sentimentscores <- cbind("sentiment"=rownames(sentimentscores),sentimentscores)
+rownames(sentimentscores) <- NULL
+ggplot(data=sentimentscores,aes(x=sentiment,y=Score))+
+  geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Sentiments")+ylab("Scores")+
+  ggtitle("Total sentiment based on scores")+
+  theme_minimal()
+
+
+blm_tweets <- get_timeline("Blklivesmatter", n = 1000)
+#WORD CLOUD
+tweet_text <- blm_tweets$text
+#Removing numbers, punctations, links and alphanumeric content
+tweet_text<- gsub('[[:digit:]]+',"", tweet_text)
+tweet_text<- gsub('[[:punct:]]+',"", tweet_text)
+tweet_text<- gsub('http[[:alnum:]]*', "", tweet_text)
+tweet_text<- gsub('([[:alpha:]])\1+', "", tweet_text)
+#creating a text corpus
+docs <- Corpus(VectorSource(tweet_text))
+# coverting the encoding to UTF-8 to handle funny characters
+docs <- tm_map(docs, function(x) iconv(enc2utf8(x), sub = "byte"))
+# Converting the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Removing english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# Removing stopwords specified by us as a character vector
+docs <- tm_map(docs, removeWords, c("amp"))
+# creating term document matrix
+tdm <- TermDocumentMatrix(docs)
+# defining tdm as matrix
+m <- as.matrix(tdm)
+# getting word counts in decreasing order
+word_freqs = sort(rowSums(m), decreasing=TRUE)
+# creating a data frame with words and their frequencies
+blm_wf <- data.frame(word=names(word_freqs), freq=word_freqs)
+# plotting wordcloud
+set.seed(1234)
+wordcloud(words = blm_wf$word, freq = blm_wf$freq,
+          min.freq = 1,scale=c(1.8,.5),
+          max.words=200, random.order=FALSE, rot.per=0.15,
+          colors=brewer.pal(8, "Dark2"))
+
+
+
+#SENTIMENT GRAPH
+install.packages(c("tm", "wordcloud", "ggplot", "ggplot2"))
+library("tm")
+library("wordcloud")
+library(NLP)
+library(RColorBrewer)
+library("lubridate")
+library("ggplot2")
+library(syuzhet)
+
+sb <- rtweet::search_tweets(q = "#starbucks", n = 1000, lang = "en")
+
+#sb$text
+
+sb$text <- iconv(sb$text, from="UTF-8", to="ASCII", sub="")
+sb$text<-gsub("(RT|via)((?:\\b\\w*@\\w+)+)","",sb$text)
+
+sb$text<-gsub("@\\w+","",sb$text)
+sb_sentiment<-get_nrc_sentiment((sb$text))
+sentimentscores<-data.frame(colSums(sb_sentiment[,]))
+names(sentimentscores) <- "Score"
+sentimentscores <- cbind("sentiment"=rownames(sentimentscores),sentimentscores)
+rownames(sentimentscores) <- NULL
+ggplot(data=sentimentscores,aes(x=sentiment,y=Score))+
+  geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Sentiments")+ylab("Scores")+
+  ggtitle("Total Sentiment of Tweets under #Starbucks")+
+  theme_minimal()
+
+
+
+#southwest
+sw <- rtweet::search_tweets(q = "#southwestairlines", n = 100, lang = "en")
+
+#sw$text
+
+sw$text <- iconv(tweet_text, from="UTF-8", to="ASCII", sub="")
+sw$text<-gsub("(RT|via)((?:\\b\\w*@\\w+)+)","",sw$text)
+
+sw$text<-gsub("@\\w+","",sw$text)
+sw_sentiment<-get_nrc_sentiment((sw$text))
+sentimentscores<-data.frame(colSums(sw_sentiment[,]))
+names(sentimentscores) <- "Score"
+sentimentscores <- cbind("sentiment"=rownames(sentimentscores),sentimentscores)
+rownames(sentimentscores) <- NULL
+ggplot(data=sentimentscores,aes(x=sentiment,y=Score))+
+  geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Sentiments")+ylab("Scores")+
+  ggtitle("Total Sentiment of Tweets under #SouthwestAirlines")+
+  theme_minimal()
+
+
+
+
+#GGPLOT
+#nike
+
+nike <- get_timeline("nike", n = 1000)
+ggplot(data = nike, aes(x = month(created_at, label = TRUE))) +
+  geom_bar(aes(fill = ..count..)) +
+  xlab("Month") + ylab("Number of tweets") + 
+  ggtitle("Tweets under @Nike") +
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=10,face="bold")) +
+  theme(plot.title = element_text(size = 20, face = "bold"))
+  theme(legend.text=element_text(size=10)) +
+  scale_fill_gradient(low = "grey", high = "black")
+  
+nike1 <- get_timeline("nike", n = 1500)
+ggplot(data = nike1, aes(x = month(created_at, label = TRUE))) +
+    geom_bar(aes(fill = ..count..)) +
+    xlab("Month") + ylab("Number of tweets") + 
+    ggtitle("Tweets under @Nike") +
+    theme(axis.text=element_text(size=10),
+          axis.title=element_text(size=10,face="bold")) +
+    theme(plot.title = element_text(size = 20, face = "bold"))
+  theme(legend.text=element_text(size=10)) +
+    scale_fill_gradient(low = "grey", high = "black")  
+
+
+#scale_fill_gradient(low = "cadetblue3", high = "chartreuse4")
+#theme_minimal() +
+  scale_fill_gradient(low = "grey", high = "black")
